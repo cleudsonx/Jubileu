@@ -1,0 +1,26 @@
+import streamlit as st
+import speech_recognition as sr
+import pyttsx3
+import cv2
+
+st.title("Assistente Pessoal para Windows 11")
+
+# Configuração do reconhecimento de voz
+recognizer = sr.Recognizer()
+engine = pyttsx3.init()
+
+def recognize_speech():
+    with sr.Microphone() as source:
+        st.write("Diga algo...")
+        audio = recognizer.listen(source)
+        try:
+            text = recognizer.recognize_google(audio, language='pt-BR')
+            st.write(f"Você disse: {text}")
+            return text
+        except sr.UnknownValueError:
+            st.write("Não entendi o que você disse.")
+        except sr.RequestError as e:
+            st.write(f"Erro ao solicitar resultados do serviço de reconhecimento de fala; {e}")
+
+if st.button("Falar"):
+    recognize_speech()
