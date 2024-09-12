@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 streamlit==1.38.0
 transformers==4.44.1
 SpeechRecognition==3.10.4
 opencv-python==4.10.0.84
 pyttsx3==2.91
+=======
+pip install streamlit
+pip install transformers
+pip install speechrecognition
+pip install opencv-python
+pip install pyttsx3
+>>>>>>> d8f1ca09edcf98c62550bcc3345f3387a41407b6

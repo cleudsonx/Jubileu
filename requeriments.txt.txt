@@ -1,5 +1,0 @@
-pip install streamlit
-pip install transformers
-pip install speechrecognition
-pip install opencv-python
-pip install pyttsx3
