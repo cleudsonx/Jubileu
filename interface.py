@@ -27,7 +27,7 @@ def main():
                     st.write(f"Classificação: {classification}")
 
                     # Perguntar ao usuário se a resposta gerada está correta
-                    if st.button("A resposta está correta?"):
+                    if st.button("A resposta está correta?", key="correct_button"):
                         learn_knowledge(user_input, generated_text)
                         st.write("Conhecimento armazenado.")
     except Exception as e:
@@ -39,7 +39,7 @@ def interface():
     st.write("O assistente está ativo e aguardando sua interação por voz.")
 
     # Botão para iniciar reconhecimento de voz
-    if st.button("Falar"):
+    if st.button("Falar", key="speak_button"):
         main()
 
 if __name__ == "__main__":
