@@ -31,3 +31,15 @@ def generate_text(prompt):
 def speak_text(text):
     engine.say(text)
     engine.runAndWait()
+
+# Pipeline de classificação de texto
+classifier = pipeline("text-classification", model="nlptown/bert-base-multilingual-uncased-sentiment")
+
+def classify_text(text):
+    classification = classifier(text)
+    return classification
+
+def handle_special_questions(text):
+    if "qual o seu nome" in text.lower():
+        return "Jubileu, você não sabe, nem eu!"
+    return None

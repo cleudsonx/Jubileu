@@ -1,13 +1,23 @@
 import streamlit as st
-from logic import recognize_speech, generate_text, speak_text
+from logic import recognize_speech, generate_text, speak_text, classify_text, handle_special_questions
 
 def main():
-    user_input = recognize_speech()
-    if user_input:
-        st.write("Gerando texto...")
-        generated_text = generate_text(user_input)
-        st.write(f"Texto gerado: {generated_text}")
-        speak_text(generated_text)
+    while True:
+        user_input = recognize_speech()
+        if user_input:
+            special_response = handle_special_questions(user_input)
+            if special_response:
+                st.write(special_response)
+                speak_text(special_response)
+            else:
+                st.write("Gerando texto...")
+                generated_text = generate_text(user_input)
+                st.write(f"Texto gerado: {generated_text}")
+                speak_text(generated_text)
+
+                st.write("Classificando texto...")
+                classification = classify_text(generated_text)
+                st.write(f"Classificação: {classification}")
 
 # Interface do Streamlit
 def interface():
