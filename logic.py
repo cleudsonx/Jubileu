@@ -1,10 +1,13 @@
 import speech_recognition as sr
 import pyttsx3
 from transformers import pipeline
+import platform
 
 # Configuração do reconhecimento de voz
 recognizer = sr.Recognizer()
-engine = pyttsx3.init()
+
+# Inicializar o pyttsx3 com o driver apropriado
+engine = pyttsx3.init(driverName='sapi5' if platform.system() == 'Windows' else 'nsss' if platform.system() == 'Darwin' else None)
 
 def recognize_speech():
     with sr.Microphone() as source:
