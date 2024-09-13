@@ -7,7 +7,19 @@ import platform
 recognizer = sr.Recognizer()
 
 # Inicializar o pyttsx3 com o driver apropriado
-engine = pyttsx3.init(driverName='sapi5' if platform.system() == 'Windows' else 'nsss' if platform.system() == 'Darwin' else None)
+try:
+    if platform.system() == 'Windows':
+        engine = pyttsx3.init(driverName='sapi5')
+    elif platform.system() == 'Darwin':
+        engine = pyttsx3.init(driverName='nsss')
+    else:
+        engine = pyttsx3.init()
+except Exception as e:
+    engine = None
+    print(f"Erro ao inicializar o pyttsx3: {e}")
+
+# Dicionário para armazenar conhecimentos
+knowledge_base = {}
 
 def recognize_speech():
     with sr.Microphone() as source:
@@ -32,8 +44,11 @@ def generate_text(prompt):
     return generated[0]['generated_text']
 
 def speak_text(text):
-    engine.say(text)
-    engine.runAndWait()
+    if engine:
+        engine.say(text)
+        engine.runAndWait()
+    else:
+        print("Engine de fala não está disponível.")
 
 # Pipeline de classificação de texto
 classifier = pipeline("text-classification", model="nlptown/bert-base-multilingual-uncased-sentiment")
@@ -46,3 +61,9 @@ def handle_special_questions(text):
     if "qual o seu nome" in text.lower():
         return "Jubileu, você não sabe, nem eu!"
     return None
+
+def learn_knowledge(question, answer):
+    knowledge_base[question.lower()] = answer
+
+def get_knowledge(question):
+    return knowledge_base.get(question.lower(), None)
