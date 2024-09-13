@@ -1,5 +1,6 @@
 import streamlit as st
-from logic import recognize_speech, generate_text, speak_text, classify_text, handle_special_questions, learn_knowledge, get_knowledge
+from speech import recognize_speech
+from logic import generate_text, speak_text, classify_text, handle_special_questions, learn_knowledge, get_knowledge
 
 def main():
     try:

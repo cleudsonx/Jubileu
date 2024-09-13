@@ -1,45 +1,50 @@
-import streamlit as st
-from logic import recognize_speech, generate_text, speak_text, classify_text, handle_special_questions, learn_knowledge, get_knowledge
+import pyttsx3
+from transformers import pipeline
+import platform
 
-def main():
-    try:
-        user_input = recognize_speech()
-        if user_input:
-            special_response = handle_special_questions(user_input)
-            if special_response:
-                st.write(special_response)
-                speak_text(special_response)
-            else:
-                # Verificar se o assistente já conhece a resposta
-                known_answer = get_knowledge(user_input)
-                if known_answer:
-                    st.write(f"Resposta conhecida: {known_answer}")
-                    speak_text(known_answer)
-                else:
-                    st.write("Gerando texto...")
-                    generated_text = generate_text(user_input)
-                    st.write(f"Texto gerado: {generated_text}")
-                    speak_text(generated_text)
+# Inicializar o pyttsx3 com o driver apropriado
+try:
+    if platform.system() == 'Windows':
+        engine = pyttsx3.init(driverName='sapi5')
+    elif platform.system() == 'Darwin':
+        engine = pyttsx3.init(driverName='nsss')
+    else:
+        engine = pyttsx3.init()
+except Exception as e:
+    engine = None
+    print(f"Erro ao inicializar o pyttsx3: {e}")
 
-                    st.write("Classificando texto...")
-                    classification = classify_text(generated_text)
-                    st.write(f"Classificação: {classification}")
+# Dicionário para armazenar conhecimentos
+knowledge_base = {}
 
-                    # Perguntar ao usuário se a resposta gerada está correta
-                    if st.button("A resposta está correta?"):
-                        learn_knowledge(user_input, generated_text)
-                        st.write("Conhecimento armazenado.")
-    except Exception as e:
-        st.error(f"Ocorreu um erro: {e}")
+# Exemplo de uso do pipeline de geração de texto com T5 em português
+text_generator = pipeline("text2text-generation", model="unicamp-dl/ptt5-base-portuguese-vocab")
 
-# Interface do Streamlit
-def interface():
-    st.title("Assistente Pessoal Jubileu")
-    st.write("O assistente está ativo e aguardando sua interação por voz.")
+def generate_text(prompt):
+    generated = text_generator(prompt, max_length=50, num_return_sequences=1)
+    return generated[0]['generated_text']
 
-    # Botão para iniciar reconhecimento de voz
-    if st.button("Falar"):
-        main()
+def speak_text(text):
+    if engine:
+        engine.say(text)
+        engine.runAndWait()
+    else:
+        print("Engine de fala não está disponível.")
 
-if __name__ == "__main__":
-    interface()
+# Pipeline de classificação de texto
+classifier = pipeline("text-classification", model="nlptown/bert-base-multilingual-uncased-sentiment")
+
+def classify_text(text):
+    classification = classifier(text)
+    return classification
+
+def handle_special_questions(text):
+    if "qual o seu nome" in text.lower():
+        return "Jubileu, você não sabe, nem eu!"
+    return None
+
+def learn_knowledge(question, answer):
+    knowledge_base[question.lower()] = answer
+
+def get_knowledge(question):
+    return knowledge_base.get(question.lower(), None)
