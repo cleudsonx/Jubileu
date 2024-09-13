@@ -5,7 +5,7 @@ import cv2
 from transformers import pipeline
 import os
 
-st.title("Assistente Pessoal para Windows 11")
+st.title("Assistente Pessoal Jubileu")
 
 # Configuração do reconhecimento de voz
 recognizer = sr.Recognizer()
@@ -26,22 +26,16 @@ def recognize_speech():
             st.write(f"Erro ao solicitar resultados do serviço de reconhecimento de fala; {e}")
             return ""
 
-# Exemplo de uso do pipeline de geração de texto
-text_generator = pipeline("text-generation", model="gpt2")
+# Exemplo de uso do pipeline de geração de texto com gpt-neo
+text_generator = pipeline("text-generation", model="EleutherAI/gpt-neo-2.7B")
 
 def generate_text(prompt):
     generated = text_generator(prompt, max_length=50, num_return_sequences=1)
     return generated[0]['generated_text']
 
-# Interface do Streamlit
-st.write("Clique no botão abaixo e fale algo para gerar texto.")
-
-if st.button("Falar"):
-    user_input = recognize_speech()
-    if user_input:
-        st.write("Gerando texto...")
-        generated_text = generate_text(user_input)
-        st.write(f"Texto gerado: {generated_text}")
+def speak_text(text):
+    engine.say(text)
+    engine.runAndWait()
 
 # Exemplo de uso do OpenCV para capturar uma imagem da webcam
 def capture_image():
@@ -62,5 +56,17 @@ def capture_image():
     finally:
         cap.release()
 
-if st.button("Capturar Imagem"):
-    capture_image()
+# Interface do Streamlit
+st.write("O assistente está ativo e aguardando sua interação por voz.")
+
+# Botão para iniciar reconhecimento de voz
+if st.button("Falar"):
+    user_input = recognize_speech()
+    if user_input:
+        if "capturar imagem" in user_input.lower():
+            capture_image()
+        else:
+            st.write("Gerando texto...")
+            generated_text = generate_text(user_input)
+            st.write(f"Texto gerado: {generated_text}")
+            speak_text(generated_text)
